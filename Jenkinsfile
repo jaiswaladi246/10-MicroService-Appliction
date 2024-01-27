@@ -20,14 +20,14 @@ pipeline {
 
         stage('2.0 Git') {
             steps {
-                git branch: 'main', url: 'https://github.com/FortressTechnologiesInc/10-MicroService-Appliction.git'
+                git branch: 'main', url: 'https://github.com/FortressTechnologiesInc/10tier.git'
             }
         }
 
         stage('3.0 SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonar') {
-                    sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=10-tier -Dsonar.projectName=10-tier -Dsonar.java.binaries=."
+                    sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=10tier -Dsonar.projectName=10tier -Dsonar.java.binaries=."
                 }
             }
         }
@@ -36,7 +36,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                        dir('/root/appnode/workspace/10-tier/src/adservice/') {
+                        dir('/root/appnode/workspace/10tier/src/adservice/') {
                             sh "docker build -t limkel/adservice:2.0 ."
                             sh "trivy image limkel/adservice:2.0 > trivy-report.txt"
                             sh "docker push limkel/adservice:2.0"
@@ -51,7 +51,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                        dir('/root/appnode/workspace/10-tier/src/cartservice/src/') {
+                        dir('/root/appnode/workspace/10tier/src/cartservice/src/') {
                             sh "docker build -t limkel/cartservice:2.0 ."
                             sh "trivy image limkel/cartservice:2.0 > trivy-report.txt"
                             sh "docker push limkel/cartservice:2.0"
@@ -66,7 +66,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                        dir('/root/appnode/workspace/10-tier/src/checkoutservice/') {
+                        dir('/root/appnode/workspace/10tier/src/checkoutservice/') {
                             sh "docker build -t limkel/checkoutservice:2.0 ."
                             sh "trivy image limkel/checkoutservice:2.0 > trivy-report.txt"
                             sh "docker push limkel/checkoutservice:2.0"
@@ -81,7 +81,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                        dir('/root/appnode/workspace/10-tier/src/currencyservice/') {
+                        dir('/root/appnode/workspace/10tier/src/currencyservice/') {
                             sh "docker build -t limkel/currencyservice:2.0 ."
                              sh "trivy image limkel/currencyservice:2.0 > trivy-report.txt"
                             sh "docker push limkel/currencyservice:2.0"
@@ -96,7 +96,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                        dir('/root/appnode/workspace/10-tier/src/emailservice/') {
+                        dir('/root/appnode/workspace/10tier/src/emailservice/') {
                             sh "docker build -t limkel/emailservice:2.0 ."
                             sh "trivy image limkel/emailservice:2.0 > trivy-report.txt"
                             sh "docker push limkel/emailservice:2.0"
@@ -111,7 +111,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                        dir('/root/appnode/workspace/10-tier/src/frontend/') {
+                        dir('/root/appnode/workspace/10tier/src/frontend/') {
                             sh "docker build -t limkel/frontend:2.0 ."
                              sh "trivy image limkel/frontend:2.0 > trivy-report.txt"
                             sh "docker push limkel/frontend:2.0"
@@ -126,7 +126,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                        dir('/root/appnode/workspace/10-tier/src/loadgenerator/') {
+                        dir('/root/appnode/workspace/10tier/src/loadgenerator/') {
                             sh "docker build -t limkel/loadgenerator:2.0 ."
                             sh "trivy image limkel/loadgenerator:2.0 > trivy-report.txt"
                             sh "docker push limkel/loadgenerator:2.0"
@@ -141,7 +141,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                        dir('/root/appnode/workspace/10-tier/src/paymentservice/') {
+                        dir('/root/appnode/workspace/10tier/src/paymentservice/') {
                             sh "docker build -t limkel/paymentservice:2.0 ."
                             sh "docker push limkel/paymentservice:2.0"
                              sh "trivy image limkel/paymentservice:2.0 > trivy-report.txt"
@@ -156,7 +156,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                        dir('/root/appnode/workspace/10-tier/src/productcatalogservice/') {
+                        dir('/root/appnode/workspace/10tier/src/productcatalogservice/') {
                             sh "docker build -t limkel/productcatalogservice:2.0 ."
                             sh "trivy image limkel/productcatalogservice:2.0 > trivy-report.txt"
                             sh "docker push limkel/productcatalogservice:2.0"
@@ -171,7 +171,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                        dir('/root/appnode/workspace/10-tier/src/recommendationservice/') {
+                        dir('/root/appnode/workspace/10tier/src/recommendationservice/') {
                             sh "docker build -t limkel/recommendationservice:2.0 ."
                              sh "trivy image limkel/recommendationservice:2.0 > trivy-report.txt"
                             sh "docker push limkel/recommendationservice:2.0"
@@ -186,7 +186,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                        dir('/root/appnode/workspace/10-tier/src/shippingservice/') {
+                        dir('/root/appnode/workspace/10tier/src/shippingservice/') {
                             sh "docker build -t limkel/shippingservice:2.0 ."
                             sh "trivy image limkel/shippingservice:2.0 > trivy-report.txt"
                             sh "docker push limkel/shippingservice:2.0"
