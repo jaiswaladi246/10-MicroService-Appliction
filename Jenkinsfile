@@ -31,7 +31,17 @@ pipeline {
                 }
             }
         }
-
+        stage('3.1 OWASP Scan') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'DP'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+        stage('3.2 Trivy FS SCAN') {
+            steps {
+                sh "trivy fs ."
+            }
+        }
         stage('4.0 adservice') {
             steps {
                 script {
@@ -198,7 +208,7 @@ pipeline {
         }
         stage('16 K8') {
             steps {
-                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: '10tier', namespace: '10tier', restrictKubeConfigAccess: false, serverUrl: '  https://192.168.58.2:8443') {
+                withKubeConfig(caCertificate: '', clusterName: 'minikube', contextName: '', credentialsId: '10tier', namespace: '10tier', restrictKubeConfigAccess: false, serverUrl: 'https://192.168.58.2:8443') {
                     sh "kubectl apply -f deployment-service.yml"
                     sh "kubectl get pods -n 10tier"
                     sh "kubectl get svc -n 10tier"
