@@ -188,7 +188,7 @@ services:
     networks:
       - dev
     ports:
-      - ":8080"
+      - "8080:8080"
     hostname: recommendationservice
     depends_on:
       - productcatalogservice
@@ -208,7 +208,7 @@ services:
     networks:
       - dev
     ports:
-      - ":50051"
+      - "50051:50051"
     hostname: shippingservice
     deploy:
       resources:
