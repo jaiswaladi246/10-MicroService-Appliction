@@ -1,0 +1,308 @@
+version: "3.9"
+networks:
+  dev:
+    driver: bridge
+services:
+  adservice:
+    env_file:
+      - ./work/.env.compose
+    image: limkel/adservice:2.0
+    networks:
+      - dev
+    hostname: adservice
+    ports:
+      - "9555:9555"
+    deploy:
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 180M
+        limits:
+          cpus: '2'
+          memory: 300M
+
+
+  cartservice:
+    env_file:
+      - ./work/.env.compose
+    image: limkel/cartservice:2.0
+    networks:
+      - dev
+    hostname: cartservice
+    depends_on:
+      - redis-cart
+    ports:
+      - "7070:7070"
+
+    deploy:
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 64M
+        limits:
+          cpus: '2'
+          memory: 128M
+
+  checkoutservice:
+    env_file:
+      - ./work/.env.compose
+    image: limkel/checkoutservice:2.0
+    networks:
+      - dev
+    hostname: checkoutservice
+    depends_on:
+      - productcatalogservice
+      - cartservice
+      - shippingservice
+      - currencyservice
+      - paymentservice
+      - emailservice
+    ports:
+      - "5050:5050"
+
+    deploy:
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 64M
+        limits:
+          cpus: '2'
+          memory: 128M
+
+  currencyservice:
+    env_file:
+      - ./work/.env.compose
+    environment:
+      PORT: 7000
+    image: limkel/currencyservice:2.0
+    networks:
+      - dev
+    hostname: currencyservice
+    ports:
+      - "7000:7000"
+
+    deploy:
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 64M
+        limits:
+          cpus: '2'
+          memory: 128M
+
+
+
+  emailservice:
+    env_file:
+      - ./work/.env.compose
+    image: limkel/checkoutservice:2.0
+    networks:
+      - dev
+    ports:
+      - "5000:5000"
+    hostname: emailservice
+    deploy:
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 64M
+        limits:
+          cpus: '2'
+          memory: 200M
+
+  frontend:
+    env_file:
+      - ./work/.env.compose
+    environment:
+      PORT: 8080
+      DISABLE_TRACING: 0
+      DISABLE_PROFILER: 0
+      JAEGER_SERVICE_ADDR: jaeger:14268
+
+    image: limkel/frontend:2.0
+    networks:
+      - dev
+    ports:
+      - "80:8080"
+    hostname: frontend
+    depends_on:
+      - checkoutservice
+      - recommendationservice
+      - adservice
+      - productcatalogservice
+      - cartservice
+      - shippingservice
+      - currencyservice
+    deploy:
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 64M
+        limits:
+          cpus: '2'
+          memory: 128M
+
+  loadgenerator:
+    env_file:
+      - ./work/.env.compose
+    image: limkel/loadgenerator:2.0
+    networks:
+      - dev
+    hostname: loadgenerator
+    depends_on:
+      - frontend
+    deploy:
+      resources:
+        reservations:
+          cpus: '2'
+          memory: 256M
+        limits:
+          cpus: '3'
+          memory: 500M
+
+  paymentservice:
+    env_file:
+      - ./work/.env.compose
+    environment:
+      PORT: 50051
+    image: limkel/paymentservice:2.0
+    networks:
+      - dev
+    ports:
+      - "50051:50051"
+    hostname: paymentservice
+    deploy:
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 64M
+        limits:
+          cpus: '2'
+          memory: 128M
+
+  recommendationservice:
+    env_file:
+      - ./work/.env.compose
+
+    image: limkel/recommendationservice:2.0
+    networks:
+      - dev
+    ports:
+      - ":8080"
+    hostname: recommendationservice
+    depends_on:
+      - productcatalogservice
+    deploy:
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 220M
+        limits:
+          cpus: '2'
+          memory: 450M
+
+  shippingservice:
+    env_file:
+      - ./work/.env.compose
+    image: limkel/shippingservice:2.0
+    networks:
+      - dev
+    ports:
+      - ":50051"
+    hostname: shippingservice
+    deploy:
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 64M
+        limits:
+          cpus: '2'
+          memory: 128M
+
+  productcatalogservice:
+    env_file:
+      - ./work/.env.compose
+    environment:
+      PORT: 3550
+      DISABLE_STATS: 1
+      DISABLE_TRACING: 1
+      DISABLE_PROFILER: 1
+      JAEGER_SERVICE_ADDR: jaeger:14268
+    image: limkel/productcatalogservice:2.0
+    networks:
+      - dev
+    ports:
+      - "3550:3550"
+    hostname: productcatalogservice
+    deploy:
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 64M
+        limits:
+          cpus: '2'
+          memory: 128M
+
+  redis-cart:
+    env_file:
+      - ./work/.env.compose
+    image: redis:alpine3.16
+    networks:
+      - dev
+    ports:
+      - "6379:6379"
+    hostname: redis-cart
+    deploy:
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 128M
+        limits:
+          cpus: '2'
+          memory: 256M
+
+  admin-node:
+    env_file:
+      - ./work/.env.compose
+    build:
+      dockerfile: ./work/admin-node/Dockerfile
+    tty: true
+    networks:
+      - dev
+    hostname: admin-node
+    deploy:
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 128M
+        limits:
+          cpus: '2'
+          memory: 256M
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.34.1
+    hostname: jaeger
+    networks:
+      - dev
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14250:14250"
+      - "14268:14268"
+      - "14269:14269"
+      - "9411:9411"
+    environment:
+      COLLECTOR_ZIPKIN_HOST_PORT: 9411
+      JAEGER_SERVICE_NAME: jaeger
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+    deploy:
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 128M
+        limits:
+          cpus: '2'
+          memory: 256M
