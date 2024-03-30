@@ -1,26 +1,100 @@
-name: Build
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
       - main
 
-
 jobs:
   build:
-    name: Build
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+
+    env:
+      SCANNER_HOME: ${{ secrets.SCANNER_HOME }}
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Clean Workspace
+        run: git clean -fdx
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Java, Maven, Node.js
+        uses: actions/setup-java@v2
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      # If you wish to fail your job when the Quality Gate is red, uncomment the
-      # following lines. This would typically be used to fail a deployment.
-      # - uses: sonarsource/sonarqube-quality-gate-action@master
-      #   timeout-minutes: 5
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          distribution: 'adopt'
+          java-version: '11'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: SonarQube Analysis
+        run: |
+          mvn clean verify sonar:sonar -Dsonar.projectKey=10tier -Dsonar.projectName=10tier -Dsonar.java.binaries=.
+
+     
+
+      - name: Build and Push adservice Docker image
+        run: |
+          docker build -t limkel/adservice:2.0 .
+          docker push limkel/adservice:2.0
+
+      - name: Build and Push cartservice Docker image
+        run: |
+          docker build -t limkel/cartservice:2.0 .
+          docker push limkel/cartservice:2.0
+
+      - name: Build and Push checkoutservice Docker image
+        run: |
+          docker build -t limkel/checkoutservice:2.0 .
+          docker push limkel/checkoutservice:2.0
+
+      - name: Build and Push currencyservice Docker image
+        run: |
+          docker build -t limkel/currencyservice:2.0 .
+          docker push limkel/currencyservice:2.0
+
+      - name: Build and Push emailservice Docker image
+        run: |
+          docker build -t limkel/emailservice:2.0 .
+          docker push limkel/emailservice:2.0
+
+      - name: Build and Push frontend Docker image
+        run: |
+          docker build -t limkel/frontend:2.0 .
+          docker push limkel/frontend:2.0
+
+      - name: Build and Push loadgenerator Docker image
+        run: |
+          docker build -t limkel/loadgenerator:2.0 .
+          docker push limkel/loadgenerator:2.0
+
+      - name: Build and Push paymentservice Docker image
+        run: |
+          docker build -t limkel/paymentservice:2.0 .
+          docker push limkel/paymentservice:2.0
+
+      - name: Build and Push productcatalogservice Docker image
+        run: |
+          docker build -t limkel/productcatalogservice:2.0 .
+          docker push limkel/productcatalogservice:2.0
+
+      - name: Build and Push recommendationservice Docker image
+        run: |
+          docker build -t limkel/recommendationservice:2.0 .
+          docker push limkel/recommendationservice:2.0
+
+      - name: Build and Push shippingservice Docker image
+        run: |
+          docker build -t limkel/shippingservice:2.0 .
+          docker push limkel/shippingservice:2.0
+
+      - name: Kubectl Action
+      uses: tale/kubectl-action@v1
+      with:
+        base64-kube-config: ${{ secrets.KUBE_CONFIG }}
+    - run: |
+          kubectl apply -f deployment-service.yml -n mygithub
+          kubectl get svc -n webapps
