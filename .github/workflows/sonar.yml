@@ -5,7 +5,6 @@ on:
     branches:
       - main
 
-
 jobs:
   build:
     name: Build
@@ -14,58 +13,85 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - uses: sonarsource/sonarqube-scan-action@master
+
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      # Check the Quality Gate status.
+      - name: SonarQube Quality Gate check
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        # Force to fail step after specific time.
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
       - name: Build and Push adservice Docker image
         run: |
           docker build -t limkel/adservice:2.0 .
           docker push limkel/adservice:2.0
+
       - name: Build and Push cartservice Docker image
         run: |
           docker build -t limkel/cartservice:2.0 .
           docker push limkel/cartservice:2.0
+
       - name: Build and Push checkoutservice Docker image
         run: |
           docker build -t limkel/checkoutservice:2.0 .
           docker push limkel/checkoutservice:2.0
+
       - name: Build and Push currencyservice Docker image
         run: |
           docker build -t limkel/currencyservice:2.0 .
           docker push limkel/currencyservice:2.0
+
       - name: Build and Push emailservice Docker image
         run: |
           docker build -t limkel/emailservice:2.0 .
           docker push limkel/emailservice:2.0
+
       - name: Build and Push frontend Docker image
         run: |
           docker build -t limkel/frontend:2.0 .
           docker push limkel/frontend:2.0
+
       - name: Build and Push loadgenerator Docker image
         run: |
           docker build -t limkel/loadgenerator:2.0 .
           docker push limkel/loadgenerator:2.0
+
       - name: Build and Push paymentservice Docker image
         run: |
           docker build -t limkel/paymentservice:2.0 .
           docker push limkel/paymentservice:2.0
+
       - name: Build and Push productcatalogservice Docker image
         run: |
           docker build -t limkel/productcatalogservice:2.0 .
           docker push limkel/productcatalogservice:2.0
+
       - name: Build and Push recommendationservice Docker image
         run: |
           docker build -t limkel/recommendationservice:2.0 .
           docker push limkel/recommendationservice:2.0
+
       - name: Build and Push shippingservice Docker image
         run: |
           docker build -t limkel/shippingservice:2.0 .
           docker push limkel/shippingservice:2.0
+
       - name: Kubectl Action
-        uses: tale/kubectl-action@v1
+        uses: azure/kubectl@v1.2.0
         with:
-          base64-kube-config: ${{ secrets.KUBE_CONFIG }}
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
       - run: |
           kubectl apply -f deployment-service.yml -n mygithub
           kubectl get svc -n webapps
