@@ -89,7 +89,7 @@ jobs:
           docker push limkel/shippingservice:2.0
 
       - name: Kubectl Action
-        uses: azure/kubectl@v1.2.0
+        uses: tale/kubectl-action@v1
         with:
           kubeconfig: ${{ secrets.KUBE_CONFIG }}
       - run: |
