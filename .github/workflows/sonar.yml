@@ -1,10 +1,9 @@
+---
 name: Build
-
 on:
   push:
     branches:
       - main
-
 jobs:
   build:
     name: Build
@@ -12,73 +11,62 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
       - name: Build and Push adservice Docker image
         run: |
-          dir('/10tier/src/adservice/')
+          cd 10tier/src/adservice/
           docker build -t limkel/adservice:2.0 .
           docker push limkel/adservice:2.0
-
       - name: Build and Push cartservice Docker image
         run: |
-          dir('/10tier/src/cartservice/src/')
+          cd 10tier/src/cartservice/src/
           docker build -t limkel/cartservice:2.0 .
           docker push limkel/cartservice:2.0
-
       - name: Build and Push checkoutservice Docker image
         run: |
-          dir('10tier/src/checkoutservice/')
+          cd 10tier/src/checkoutservice/
           docker build -t limkel/checkoutservice:2.0 .
           docker push limkel/checkoutservice:2.0
-
       - name: Build and Push currencyservice Docker image
         run: |
-          dir('/10tier/src/currencyservice/')
+          cd 10tier/src/currencyservice/
           docker build -t limkel/currencyservice:2.0 .
           docker push limkel/currencyservice:2.0
-
       - name: Build and Push emailservice Docker image
         run: |
-          dir('/10tier/src/emailservice/')
+          cd 10tier/src/emailservice/
           docker build -t limkel/emailservice:2.0 .
           docker push limkel/emailservice:2.0
-
       - name: Build and Push frontend Docker image
         run: |
-          dir('/10tier/src/frontend/')
+          cd 10tier/src/frontend/
           docker build -t limkel/frontend:2.0 .
           docker push limkel/frontend:2.0
-
       - name: Build and Push loadgenerator Docker image
         run: |
-          dir('/10tier/src/loadgenerator/')
+          cd 10tier/src/loadgenerator/
           docker build -t limkel/loadgenerator:2.0 .
           docker push limkel/loadgenerator:2.0
-
       - name: Build and Push paymentservice Docker image
         run: |
-          dir('/10tier/src/paymentservice/')
+          cd 10tier/src/paymentservice/
           docker build -t limkel/paymentservice:2.0 .
           docker push limkel/paymentservice:2.0
-
       - name: Build and Push productcatalogservice Docker image
         run: |
-          dir('/10tier/src/productcatalogservice/')
+          cd 10tier/src/productcatalogservice/
           docker build -t limkel/productcatalogservice:2.0 .
           docker push limkel/productcatalogservice:2.0
-
       - name: Build and Push recommendationservice Docker image
         run: |
-          dir('/10tier/src/recommendationservice/')
+          cd 10tier/src/recommendationservice/
           docker build -t limkel/recommendationservice:2.0 .
           docker push limkel/recommendationservice:2.0
-
       - name: Build and Push shippingservice Docker image
         run: |
-           dir('/10tier/src/shippingservice/')
+          cd 10tier/src/shippingservice/
           docker build -t limkel/shippingservice:2.0 .
           docker push limkel/shippingservice:2.0
-
       - name: Kubectl Action
         uses: tale/kubectl-action@v1
         with:
