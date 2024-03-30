@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline by Fortress Technologies Inc
 
 on:
   push:
@@ -30,10 +30,24 @@ jobs:
         with:
           node-version: '14'
 
-      - name: SonarQube Analysis
-        run: |
-          mvn clean verify sonar:sonar -Dsonar.projectKey=10tier -Dsonar.projectName=10tier -Dsonar.java.binaries=.
+      - name: SonarQube Scan
+      uses: sonarsource/sonarqube-scan-action@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
+    - name: Install jq
+      run: sudo apt-get update && sudo apt-get install -y jq
+
+  # Check the Quality Gate status.
+    - name: SonarQube Quality Gate check
+      id: sonarqube-quality-gate-check
+      uses: sonarsource/sonarqube-quality-gate-action@master
+      # Force to fail step after specific time.
+      timeout-minutes: 1
+      env:
+       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+       SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
      
 
       - name: Build and Push adservice Docker image
