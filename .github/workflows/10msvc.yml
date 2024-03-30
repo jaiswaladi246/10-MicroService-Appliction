@@ -10,8 +10,6 @@ jobs:
     env:
       SCANNER_HOME: ${{ secrets.SCANNER_HOME }}
     steps:
-      - name: Clean Workspace
-        run: git clean -fdx
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Setup Java, Maven, Node.js
