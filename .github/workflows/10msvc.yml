@@ -6,7 +6,7 @@ on:
       - main
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu:latest
     env:
       SCANNER_HOME: ${{ secrets.SCANNER_HOME }}
     steps:
