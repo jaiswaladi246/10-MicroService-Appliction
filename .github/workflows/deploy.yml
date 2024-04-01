@@ -1,146 +1,172 @@
+---
 name: Build Docker Images, Scan, and Run
-
 on:
   push:
     branches:
       - main
-
 jobs:
   build-scan-and-run:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
       - name: Setup Java, Maven, Node.js
         uses: actions/setup-java@v2
         with:
           distribution: adopt
           java-version: "17"
-
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: "20"
-
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
-
       - name: Install Trivy
-        run: |
-          wget https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.tar.gz
+        run: >
+          wget
+          https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.tar.gz
+
           tar zxvf trivy_0.20.0_Linux-64bit.tar.gz
+
           sudo mv trivy /usr/local/bin/
-
       - name: Install OWASP Dependency Check
-        run: |
-          wget https://dl.bintray.com/jeremy-long/owasp/dependency-check-7.0.0-release.zip
+        run: >
+          wget
+          https://dl.bintray.com/jeremy-long/owasp/dependency-check-7.0.0-release.zip
+
           unzip dependency-check-7.0.0-release.zip
+
           sudo mv dependency-check /usr/local/bin/
-
       - name: Run OWASP Dependency Check on 10 microservices
-        run: |
+        run: >
           dependency-check --scan /src/ --format HTML -f ALL -o /tmp/owasp-reports
-
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+      - name: SonarQube Quality Gate check
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       - name: Trivy FS Scan on 10 microservices
-        run: |
-          trivy fs --severity HIGH,CRITICAL --format table -o trivy-fs-report.html /src/
-
+        run: >
+          trivy fs --severity HIGH,CRITICAL --format table -o trivy-fs-report.html
+          /src/
       - name: Trivy Scan adservice
-        run: trivy image --format table -o trivy-image-report-adservice.html limkel/adservice:2.0
-
+        run: trivy image --format table -o trivy-image-report-adservice.html
+          limkel/adservice:2.0
       - name: Trivy Scan cartservice
-        run: trivy image --format table -o trivy-image-report-cartservice.html limkel/cartservice:2.0
-
+        run: trivy image --format table -o trivy-image-report-cartservice.html
+          limkel/cartservice:2.0
       - name: Trivy Scan checkoutservice
-        run: trivy image --format table -o trivy-image-report-checkoutservice.html limkel/checkoutservice:2.0
-
+        run: trivy image --format table -o trivy-image-report-checkoutservice.html
+          limkel/checkoutservice:2.0
       - name: Trivy Scan currencyservice
-        run: trivy image --format table -o trivy-image-report-currencyservice.html limkel/currencyservice:2.0
-
+        run: trivy image --format table -o trivy-image-report-currencyservice.html
+          limkel/currencyservice:2.0
       - name: Trivy Scan emailservice
-        run: trivy image --format table -o trivy-image-report-emailservice.html limkel/emailservice:2.0
-
+        run: trivy image --format table -o trivy-image-report-emailservice.html
+          limkel/emailservice:2.0
       - name: Trivy Scan frontend
-        run: trivy image --format table -o trivy-image-report-frontend.html limkel/frontend:2.0
-
+        run: trivy image --format table -o trivy-image-report-frontend.html
+          limkel/frontend:2.0
       - name: Trivy Scan loadgenerator
-        run: trivy image --format table -o trivy-image-report-loadgenerator.html limkel/loadgenerator:2.0
-
+        run: trivy image --format table -o trivy-image-report-loadgenerator.html
+          limkel/loadgenerator:2.0
       - name: Trivy Scan paymentservice
-        run: trivy image --format table -o trivy-image-report-paymentservice.html limkel/paymentservice:2.0
-
+        run: trivy image --format table -o trivy-image-report-paymentservice.html
+          limkel/paymentservice:2.0
       - name: Trivy Scan productcatalogservice
-        run: trivy image --format table -o trivy-image-report-productcatalogservice.html limkel/productcatalogservice:2.0
-
+        run: trivy image --format table -o trivy-image-report-productcatalogservice.html
+          limkel/productcatalogservice:2.0
       - name: Trivy Scan recommendationservice
-        run: trivy image --format table -o trivy-image-report-recommendationservice.html limkel/recommendationservice:2.0
-
+        run: trivy image --format table -o trivy-image-report-recommendationservice.html
+          limkel/recommendationservice:2.0
       - name: Trivy Scan shippingservice
-        run: trivy image --format table -o trivy-image-report-shippingservice.html limkel/shippingservice:2.0
-
+        run: trivy image --format table -o trivy-image-report-shippingservice.html
+          limkel/shippingservice:2.0
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Build and push Docker images
-        run: |
+        run: >
           docker build -t limkel/adservice:2.0 src/adservice
+
           docker build -t limkel/cartservice:2.0 src/cartservice/src
+
           docker build -t limkel/checkoutservice:2.0 src/checkoutservice
+
           docker build -t limkel/currencyservice:2.0 src/currencyservice
+
           docker build -t limkel/emailservice:2.0 src/emailservice
+
           docker build -t limkel/frontend:2.0 src/frontend
+
           docker build -t limkel/loadgenerator:2.0 src/loadgenerator
+
           docker build -t limkel/paymentservice:2.0 src/paymentservice
+
           docker build -t limkel/productcatalogservice:2.0 src/productcatalogservice
+
           docker build -t limkel/recommendationservice:2.0 src/recommendationservice
+
           docker build -t limkel/shippingservice:2.0 src/shippingservice
 
+
           docker push limkel/adservice:2.0
+
           docker push limkel/cartservice:2.0
+
           docker push limkel/checkoutservice:2.0
+
           docker push limkel/currencyservice:2.0
+
           docker push limkel/emailservice:2.0
+
           docker push limkel/frontend:2.0
+
           docker push limkel/loadgenerator:2.0
+
           docker push limkel/paymentservice:2.0
+
           docker push limkel/productcatalogservice:2.0
+
           docker push limkel/recommendationservice:2.0
+
           docker push limkel/shippingservice:2.0
-
       - name: Run adservice container
-        run: docker run -d -p 9555:9555--name adservice limkel/adservice:2.0
-
+        run: docker run -d -p 9555:9555 --name adservice limkel/adservice:2.0
       - name: Run cartservice container
         run: docker run -d -p 7070:7070 --name cartservice limkel/cartservice:2.0
-
       - name: Run checkoutservice container
-        run: docker run -d -p 5050:5050 --name checkoutservice limkel/checkoutservice:2.0
-
+        run: docker run -d -p 5050:5050 --name checkoutservice
+          limkel/checkoutservice:2.0
       - name: Run currencyservice container
-        run: docker run -d -p 7000:7000 --name currencyservice limkel/currencyservice:2.0
-
+        run: docker run -d -p 7000:7000 --name currencyservice
+          limkel/currencyservice:2.0
       - name: Run emailservice container
         run: docker run -d -p 5000:5000 --name emailservice limkel/emailservice:2.0
-
       - name: Run frontend container
         run: docker run -d -p 80:80 --name frontend limkel/frontend:2.0
-
       - name: Run loadgenerator container
         run: docker run -d -p 80:80 --name loadgenerator limkel/loadgenerator:2.0
-
       - name: Run paymentservice container
-        run: docker run -d -p 50051:50051  --name paymentservice limkel/paymentservice:2.0
-
+        run: docker run -d -p 50051:50051 --name paymentservice
+          limkel/paymentservice:2.0
       - name: Run productcatalogservice container
-        run: docker run -d -p 3550:3550 --name productcatalogservice limkel/productcatalogservice:2.0
-
+        run: docker run -d -p 3550:3550 --name productcatalogservice
+          limkel/productcatalogservice:2.0
       - name: Run recommendationservice container
-        run: docker run -d -p 8080:8080 --name recommendationservice limkel/recommendationservice:2.0
-
+        run: docker run -d -p 8080:8080 --name recommendationservice
+          limkel/recommendationservice:2.0
       - name: Run shippingservice container
-        run: docker run -d -p 50051:50051 --name shippingservice limkel/shippingservice:2.0
+        run: docker run -d -p 50051:50051 --name shippingservice
+          limkel/shippingservice:2.0
