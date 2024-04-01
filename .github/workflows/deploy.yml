@@ -170,3 +170,11 @@ jobs:
       - name: Run shippingservice container
         run: docker run -d -p 50051:50051 --name shippingservice
           limkel/shippingservice:2.0
+      - name: Kubectl Action
+      uses: tale/kubectl-action@v1
+      with:
+        base64-kube-config: ${{ secrets.KUBE_CONFIG }}
+    - run: |
+          kubectl apply -f deployment-service.yml -n mygithub
+          kubectl get svc -n mygithub
+
