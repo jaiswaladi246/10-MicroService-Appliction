@@ -25,6 +25,9 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.java.binaries=.
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
       - name: SonarQube Quality Gate check
@@ -49,20 +52,4 @@ jobs:
           wget https://github.com/jeremylong/DependencyCheck/releases/download/v7.0.2/dependency-check-7.0.2-release.zip
           unzip dependency-check-7.0.2-release.zip
           sudo mv dependency-check/bin/* /usr/local/bin/
-      - name: OWASP Dependency-Check Scan
-        run: dependency-check --scan /10microsvc/src/
-      - name: Build and Push Docker images for microservices
-        run: |
-          services=(adservice cartservice checkoutservice currencyservice emailservice frontend loadgenerator paymentservice productcatalogservice recommendationservice shippingservice)
-          for service in "${services[@]}"; do
-            cd microservices/$service
-            docker build -t "limkel/$service:2.0" .
-            docker push "limkel/$service:2.0"
-          done
-      - name: Kubectl Action
-        uses: tale/kubectl-action@v1
-        with:
-          base64-kube-config: ${{ secrets.KUBE_CONFIG }}
-      - run: |
-          kubectl apply -f deployment-service.yml -n mygithub
-          kubectl get svc -n webapps
+      - name: OWASP Dependency-Chec
