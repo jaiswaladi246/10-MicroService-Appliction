@@ -113,34 +113,34 @@ jobs:
           docker push limkel/shippingservice:2.0
 
       - name: Run adservice container
-        run: docker run -d --name adservice limkel/adservice:2.0
+        run: docker run -d -p 9555:9555--name adservice limkel/adservice:2.0
 
       - name: Run cartservice container
-        run: docker run -d --name cartservice limkel/cartservice:2.0
+        run: docker run -d -p 7070:7070 --name cartservice limkel/cartservice:2.0
 
       - name: Run checkoutservice container
-        run: docker run -d --name checkoutservice limkel/checkoutservice:2.0
+        run: docker run -d -p 5050:5050 --name checkoutservice limkel/checkoutservice:2.0
 
       - name: Run currencyservice container
-        run: docker run -d --name currencyservice limkel/currencyservice:2.0
+        run: docker run -d -p 7000:7000 --name currencyservice limkel/currencyservice:2.0
 
       - name: Run emailservice container
-        run: docker run -d --name emailservice limkel/emailservice:2.0
+        run: docker run -d -p 5000:5000 --name emailservice limkel/emailservice:2.0
 
       - name: Run frontend container
-        run: docker run -d --name frontend limkel/frontend:2.0
+        run: docker run -d -p 80:80 --name frontend limkel/frontend:2.0
 
       - name: Run loadgenerator container
-        run: docker run -d --name loadgenerator limkel/loadgenerator:2.0
+        run: docker run -d -p 80:80 --name loadgenerator limkel/loadgenerator:2.0
 
       - name: Run paymentservice container
-        run: docker run -d --name paymentservice limkel/paymentservice:2.0
+        run: docker run -d -p 50051:50051  --name paymentservice limkel/paymentservice:2.0
 
       - name: Run productcatalogservice container
-        run: docker run -d --name productcatalogservice limkel/productcatalogservice:2.0
+        run: docker run -d -p 3550:3550 --name productcatalogservice limkel/productcatalogservice:2.0
 
       - name: Run recommendationservice container
-        run: docker run -d --name recommendationservice limkel/recommendationservice:2.0
+        run: docker run -d -p 8080:8080 --name recommendationservice limkel/recommendationservice:2.0
 
       - name: Run shippingservice container
-        run: docker run -d --name shippingservice limkel/shippingservice:2.0
+        run: docker run -d -p 50051:50051 --name shippingservice limkel/shippingservice:2.0
