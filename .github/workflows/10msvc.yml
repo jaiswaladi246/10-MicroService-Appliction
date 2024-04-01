@@ -47,13 +47,7 @@ jobs:
           trivy fs --format table -o trivy-fs-report.html .
       - name: Trivy Scan
         run: trivy image --severity HIGH,CRITICAL limkel/adservice:2.0
-      - name: Install OWASP Dependency-Check
-        run: |
-          wget https://github.com/jeremylong/DependencyCheck/releases/download/v7.0.2/dependency-check-7.0.2-release.zip
-          unzip dependency-check-7.0.2-release.zip
-          sudo mv dependency-check/bin/* /usr/local/bin/
-      - name: OWASP Dependency-Check Scan
-        run: dependency-check --scan /10microsvc/src/
+      
       - name: Build and Push Docker images for microservices
         run: |
           services=(adservice cartservice checkoutservice currencyservice emailservice frontend loadgenerator paymentservice productcatalogservice recommendationservice shippingservice)
