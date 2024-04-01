@@ -49,7 +49,7 @@ jobs:
       - name: Build and push Docker images
         run: |
           docker build -t limkel/adservice:2.0 src/adservice
-          docker build -t limkel/cartservice:2.0 src/cartservice
+          docker build -t limkel/cartservice:2.0 src/cartservice/src
           docker build -t limkel/checkoutservice:2.0 src/checkoutservice
           docker build -t limkel/currencyservice:2.0 src/currencyservice
           docker build -t limkel/emailservice:2.0 src/emailservice
