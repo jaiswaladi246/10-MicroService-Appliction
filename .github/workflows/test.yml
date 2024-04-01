@@ -1,0 +1,77 @@
+name: Build Docker Images
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Java, Maven, Node.js
+        uses: actions/setup-java@v2
+        with:
+          distribution: adopt
+          java-version: "17"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20"
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Install Trivy
+        run: |
+          wget https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.tar.gz
+          tar zxvf trivy_0.20.0_Linux-64bit.tar.gz
+          sudo mv trivy /usr/local/bin/
+
+      - name: Trivy FS Scan
+        run: |
+          trivy fs --severity HIGH,CRITICAL --format table -o trivy-fs-report.html .
+
+      - name: Trivy Scan
+        run: trivy image --severity HIGH,CRITICAL limkel/adservice:2.0
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker images
+        run: |
+          docker build -t limkel/adservice:2.0 src/adservice
+          docker build -t limkel/cartservice:2.0 src/cartservice
+          docker build -t limkel/checkoutservice:2.0 src/checkoutservice
+          docker build -t limkel/currencyservice:2.0 src/currencyservice
+          docker build -t limkel/emailservice:2.0 src/emailservice
+          docker build -t limkel/frontend:2.0 src/frontend
+          docker build -t limkel/loadgenerator:2.0 src/loadgenerator
+          docker build -t limkel/paymentservice:2.0 src/paymentservice
+          docker build -t limkel/productcatalogservice:2.0 src/productcatalogservice
+          docker build -t limkel/recommendationservice:2.0 src/recommendationservice
+          docker build -t limkel/shippingservice:2.0 src/shippingservice
+
+          docker push limkel/adservice:2.0
+          docker push limkel/cartservice:2.0
+          docker push limkel/checkoutservice:2.0
+          docker push limkel/currencyservice:2.0
+          docker push limkel/emailservice:2.0
+          docker push limkel/frontend:2.0
+          docker push limkel/loadgenerator:2.0
+          docker push limkel/paymentservice:2.0
+          docker push limkel/productcatalogservice:2.0
+          docker push limkel/recommendationservice:2.0
+          docker push limkel/shippingservice:2.0
+
+    env:
+      username: ${{ secrets.DOCKERHUB_USERNAME }}
+      password: ${{ secrets.DOCKERHUB_TOKEN }}
