@@ -1,25 +1,31 @@
 name: CI/CD Pipeline by Fortress Technologies Inc
+
 on:
   push:
     branches:
       - main
+
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
       SCANNER_HOME: ${{ secrets.SCANNER_HOME }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Setup Java, Maven, Node.js
         uses: actions/setup-java@v2
         with:
           distribution: adopt
           java-version: "17"
+
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: "20"
+
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
@@ -28,8 +34,10 @@ jobs:
         with:
           args: >
             -Dsonar.java.binaries=.
+
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
@@ -37,29 +45,95 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
       - name: Install Trivy
         run: |
           wget https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.tar.gz
           tar zxvf trivy_0.20.0_Linux-64bit.tar.gz
           sudo mv trivy /usr/local/bin/
+
       - name: Trivy FS Scan
         run: |
           trivy fs --format table -o trivy-fs-report.html .
+
       - name: Trivy Scan
         run: trivy image --severity HIGH,CRITICAL limkel/adservice:2.0
-      
-      - name: Build and Push Docker images for microservices
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build and push adservice
+        working-directory: src/adservice
         run: |
-          services=(adservice cartservice checkoutservice currencyservice emailservice frontend loadgenerator paymentservice productcatalogservice recommendationservice shippingservice)
-          for service in "${services[@]}"; do
-            cd microservices/$service
-            docker build -t "limkel/$service:2.0" .
-            docker push "limkel/$service:2.0"
-          done
+          docker build -t limkel/adservice:2.0 .
+          docker push limkel/adservice:2.0
+
+      - name: Build and push cartservice
+        working-directory: src/cartservice
+        run: |
+          docker build -t limkel/cartservice:2.0 .
+          docker push limkel/cartservice:2.0
+
+      - name: Build and push checkoutservice
+        working-directory: src/checkoutservice
+        run: |
+          docker build -t limkel/checkoutservice:2.0 .
+          docker push limkel/checkoutservice:2.0
+
+      - name: Build and push currencyservice
+        working-directory: src/currencyservice
+        run: |
+          docker build -t limkel/currencyservice:2.0 .
+          docker push limkel/currencyservice:2.0
+
+      - name: Build and push emailservice
+        working-directory: src/emailservice
+        run: |
+          docker build -t limkel/emailservice:2.0 .
+          docker push limkel/emailservice:2.0
+
+      - name: Build and push frontend
+        working-directory: src/frontend
+        run: |
+          docker build -t limkel/frontend:2.0 .
+          docker push limkel/frontend:2.0
+
+      - name: Build and push loadgenerator
+        working-directory: src/loadgenerator
+        run: |
+          docker build -t limkel/loadgenerator:2.0 .
+          docker push limkel/loadgenerator:2.0
+
+      - name: Build and push paymentservice
+        working-directory: src/paymentservice
+        run: |
+          docker build -t limkel/paymentservice:2.0 .
+          docker push limkel/paymentservice:2.0
+
+      - name: Build and push productcatalogservice
+        working-directory: src/productcatalogservice
+        run: |
+          docker build -t limkel/productcatalogservice:2.0 .
+          docker push limkel/productcatalogservice:2.0
+
+      - name: Build and push recommendationservice
+        working-directory: src/recommendationservice
+        run: |
+          docker build -t limkel/recommendationservice:2.0 .
+          docker push limkel/recommendationservice:2.0
+
+      - name: Build and push shippingservice
+        working-directory: src/shippingservice
+        run: |
+          docker build -t limkel/shippingservice:2.0 .
+          docker push limkel/shippingservice:2.0
+
       - name: Kubectl Action
-        uses: tale/kubectl-action@v1
+        uses: azure/k8s-set-context@v1
         with:
-          base64-kube-config: ${{ secrets.KUBE_CONFIG }}
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+          context: ${{ secrets.KUBE_CONTEXT }}
+
       - run: |
           kubectl apply -f deployment-service.yml -n mygithub
           kubectl get svc -n webapps
