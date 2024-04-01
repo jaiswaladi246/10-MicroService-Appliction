@@ -51,10 +51,11 @@ jobs:
           sudo mv dependency-check/bin/* /usr/local/bin/
       - name: OWASP Dependency-Check Scan
         run: dependency-check --scan /10microsvc/src/
-      - name: Build and Push Docker images
+      - name: Build and Push Docker images for microservices
         run: |
           services=(adservice cartservice checkoutservice currencyservice emailservice frontend loadgenerator paymentservice productcatalogservice recommendationservice shippingservice)
           for service in "${services[@]}"; do
+            cd microservices/$service
             docker build -t "limkel/$service:2.0" .
             docker push "limkel/$service:2.0"
           done
