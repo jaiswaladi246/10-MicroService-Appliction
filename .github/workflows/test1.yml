@@ -35,8 +35,7 @@ jobs:
 
       - name: Install OWASP Dependency Check
         run: |
-          wget https://dl.bintray.com/jeremy-long/owasp/dependency-check-7.0.0-release.zip
-          unzip dependency-check-7.0.0-release.zip
+          wget https://github.com/jeremylong/DependencyCheck/releases/download/v6.2.1/dependency-check-6.2.1-release.zip
           sudo mv dependency-check /usr/local/bin/
 
       - name: Run OWASP Dependency Check on 10 microservices
