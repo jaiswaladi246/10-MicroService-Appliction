@@ -16,7 +16,6 @@ jobs:
         with:
           distribution: adopt
           java-version: "17"
-          distribution: 'temurin'
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
