@@ -47,7 +47,7 @@ jobs:
           unzip dependency-check-7.0.2-release.zip
           sudo mv dependency-check/bin/* /usr/local/bin/
       - name: OWASP Dependency-Check Scan
-        run: dependency-check --scan /10microsvc/
+        run: dependency-check --scan /10microsvc/src/
       - name: Build and Push Docker images
         run: |
           services=(adservice cartservice checkoutservice currencyservice emailservice frontend loadgenerator paymentservice productcatalogservice recommendationservice shippingservice)
