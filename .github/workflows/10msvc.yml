@@ -40,8 +40,8 @@ jobs:
           tar zxvf trivy_0.20.0_Linux-64bit.tar.gz
           sudo mv trivy /usr/local/bin/
       - name: Trivy FS Scan
-      run: |
-        trivy fs --format table -o trivy-fs-report.html .
+        run: |
+          trivy fs --format table -o trivy-fs-report.html .
       - name: Trivy Scan
         run: trivy image --severity HIGH,CRITICAL limkel/adservice:2.0
       - name: Install OWASP Dependency-Check
