@@ -34,6 +34,20 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      - name: Install Trivy
+        run: |
+          wget https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.tar.gz
+          tar zxvf trivy_0.20.0_Linux-64bit.tar.gz
+          sudo mv trivy /usr/local/bin/
+      - name: Trivy Scan
+        run: trivy image --severity HIGH,CRITICAL limkel/adservice:2.0
+      - name: Install OWASP Dependency-Check
+        run: |
+          wget https://github.com/jeremylong/DependencyCheck/releases/download/v7.0.2/dependency-check-7.0.2-release.zip
+          unzip dependency-check-7.0.2-release.zip
+          sudo mv dependency-check/bin/* /usr/local/bin/
+      - name: OWASP Dependency-Check Scan
+        run: dependency-check --scan /10microsvc/
       - name: Build and Push Docker images
         run: |
           services=(adservice cartservice checkoutservice currencyservice emailservice frontend loadgenerator paymentservice productcatalogservice recommendationservice shippingservice)
