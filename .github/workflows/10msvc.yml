@@ -54,7 +54,7 @@ jobs:
           docker push limkel/adservice:2.0
 
       - name: Build and push cartservice
-        working-directory: src/cartservice
+        working-directory: /src/cartservice/src/
         run: |
           docker build -t limkel/cartservice:2.0 .
           docker push limkel/cartservice:2.0
