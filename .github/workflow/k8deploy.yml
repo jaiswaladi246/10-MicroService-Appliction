@@ -1,0 +1,37 @@
+name: CICD by FortressIT Consults Inc
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-scan-and-run:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Java, Maven, Node.js
+        uses: actions/setup-java@v2
+        with:
+          distribution: adopt
+          java-version: "17"
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20"
+     
+      - name: Install Trivy
+        run: |
+          wget https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.tar.gz
+          tar zxvf trivy_0.20.0_Linux-64bit.tar.gz
+          sudo mv trivy /usr/local/bin/
+     
+      - name: Kubectl Action
+        uses: tale/kubectl-action@v1
+        with:
+          base64-kube-config: ${{ secrets.KUBE_CONFIG }}
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f deployment-service.yml -n mygithub
+      - name: Check Kubernetes Services
+        run: |
+          kubectl get svc -n mygithub
