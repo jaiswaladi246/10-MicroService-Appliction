@@ -1,4 +1,4 @@
-name: Build Docker Images, Scan, and Run
+name: CICD by FortressIT Consults Inc
 on:
   push:
     branches:
