@@ -18,18 +18,16 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: "20"
-     
       - name: Install Trivy
         run: |
           wget https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.tar.gz
           tar zxvf trivy_0.20.0_Linux-64bit.tar.gz
           sudo mv trivy /usr/local/bin/
       - name: SonarQube Scan
-      uses: sonarsource/sonarqube-scan-action@master
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-     
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       - name: Kubectl Action
         uses: tale/kubectl-action@v1
         with:
