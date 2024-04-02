@@ -18,8 +18,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: "20"
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
+     
       - name: Install Trivy
         run: |
           wget https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-64bit.tar.gz
