@@ -28,7 +28,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: adijaiswal/emailservice:latest
+        image: jagabandhusahoo77/emailservice:latest
         ports:
         - containerPort: 8080
         env:
@@ -81,7 +81,7 @@ spec:
       serviceAccountName: default
       containers:
         - name: server
-          image: adijaiswal/checkoutservice:latest
+          image: jagabandhusahoo77/checkoutservice:latest
           ports:
           - containerPort: 5050
           readinessProbe:
@@ -143,7 +143,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        image: adijaiswal/recommendationservice:latest
+        image: jagabandhusahoo77/recommendationservice:latest
         ports:
         - containerPort: 8080
         readinessProbe:
@@ -200,7 +200,7 @@ spec:
       serviceAccountName: default
       containers:
         - name: server
-          image: adijaiswal/frontend:latest
+          image: jagabandhusahoo77/frontend:latest
           ports:
           - containerPort: 8080
           readinessProbe:
@@ -236,16 +236,8 @@ spec:
             value: "checkoutservice:5050"
           - name: AD_SERVICE_ADDR
             value: "adservice:9555"
-          # # ENV_PLATFORM: One of: local, gcp, aws, azure, onprem, alibaba
-          # # When not set, defaults to "local" unless running in GKE, otherwies auto-sets to gcp
-          # - name: ENV_PLATFORM
-          #   value: "aws"
           - name: ENABLE_PROFILER
             value: "0"
-          # - name: CYMBAL_BRANDING
-          #   value: "true"
-          # - name: FRONTEND_MESSAGE
-          #   value: "Replace this with a message you want to display on all pages."
           resources:
             requests:
               cpu: 100m
@@ -297,7 +289,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        image: adijaiswal/paymentservice:latest
+        image: jagabandhusahoo77/paymentservice:latest
         ports:
         - containerPort: 50051
         env:
@@ -349,7 +341,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        image: adijaiswal/productcatalogservice:latest
+        image: jagabandhusahoo77/productcatalogservice:latest
         ports:
         - containerPort: 3550
         env:
@@ -401,7 +393,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        image: adijaiswal/cartservice:latest
+        image: jagabandhusahoo77/cartservice:latest
         ports:
         - containerPort: 7070
         env:
@@ -465,7 +457,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: adijaiswal/loadgenerator:latest
+        image: jagabandhusahoo77/loadgenerator:latest
         env:
         - name: FRONTEND_ADDR
           value: "frontend:80"
@@ -496,7 +488,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        image: adijaiswal/currencyservice:latest
+        image: jagabandhusahoo77/currencyservice:latest
         ports:
         - name: grpc
           containerPort: 7000
@@ -548,7 +540,7 @@ spec:
       serviceAccountName: default
       containers:
       - name: server
-        image: adijaiswal/shippingservice:latest
+        image: jagabandhusahoo77/shippingservice:latest
         ports:
         - containerPort: 50051
         env:
@@ -654,7 +646,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        image: adijaiswal/adservice:latest
+        image: jagabandhusahoo77/adservice:latest
         ports:
         - containerPort: 9555
         env:
