@@ -117,7 +117,7 @@ The [`/terraform` folder](/terraform) contains instructions for using [Terraform
 - **Istio/Anthos Service Mesh**: [See these instructions.](/kustomize/components/service-mesh-istio/README.md)
 - **non-GKE clusters (Minikube, Kind)**: see the [Development Guide](/docs/development-guide.md)
 
-## Deploy Online Boutique variations with Kustomize
+## Deploy Online Boutique variations with Kustomizee
 
 The [`/kustomize` folder](/kustomize) contains instructions for customizing the deployment of Online Boutique with different variations such as:
 * integrating with [Google Cloud Operations](/kustomize/components/google-cloud-operations/)
