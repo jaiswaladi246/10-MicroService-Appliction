@@ -4,7 +4,7 @@
 
 ![Continuous Integration](https://github.com/GoogleCloudPlatform/microservices-demo/workflows/Continuous%20Integration%20-%20Main/Release/badge.svg)
 
-**Online Boutique** is a cloud-first microservices demo application.
+**Online Boutiquedfde** is a cloud-first microservices demo application.
 Online Boutique consists of an 11-tier microservices application. The application is a
 web-based e-commerce app where users can browse items,
 add them to the cart, and purchase them.
@@ -12,7 +12,7 @@ add them to the cart, and purchase them.
 Google uses this application to demonstrate the use of technologies like
 Kubernetes, GKE, Istio, Stackdriver, and gRPC. This application
 works on any Kubernetes cluster, like Google
-Kubernetes Engine (GKE). It’s **easy to deploy with little to no configuration**.
+Kubernetes Engine (GKE). It’s **easy to deploy with little to no configuratllion**.
 
 If you’re using this demo, please **★Star** this repository to show your interest!
 
@@ -117,7 +117,7 @@ The [`/terraform` folder](/terraform) contains instructions for using [Terraform
 - **Istio/Anthos Service Mesh**: [See these instructions.](/kustomize/components/service-mesh-istio/README.md)
 - **non-GKE clusters (Minikube, Kind)**: see the [Development Guide](/docs/development-guide.md)
 
-## Deploy Online Boutique variations with Kustomize
+## Deploy Online Boutique variations with Kustomizee
 
 The [`/kustomize` folder](/kustomize) contains instructions for customizing the deployment of Online Boutique with different variations such as:
 * integrating with [Google Cloud Operations](/kustomize/components/google-cloud-operations/)
